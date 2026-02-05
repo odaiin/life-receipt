@@ -3,47 +3,228 @@
 @tailwind utilities;
 
 :root {
-  --foreground: #000000;
+  --foreground: #1a1a2e;
   --background: #ffffff;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* 키오스크 스타일 */
-.kiosk-input {
-  @apply w-full px-4 py-3 border-2 border-black rounded-none bg-white text-black text-lg font-medium focus:outline-none focus:ring-2 focus:ring-black;
+/* 모던 인풋 스타일 */
+.modern-input {
+  @apply w-full px-5 py-4 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl text-gray-900 text-lg font-medium transition-all duration-300;
+  @apply focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400 focus:bg-white;
+  @apply placeholder:text-gray-400;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.kiosk-btn {
-  @apply px-6 py-3 font-bold text-lg transition-all duration-200 border-2;
+.modern-input:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
-.kiosk-btn-primary {
-  @apply bg-black text-white border-black hover:bg-white hover:text-black;
+/* MBTI 카드 버튼 */
+.mbti-card {
+  @apply relative flex-1 py-4 text-center font-bold text-lg rounded-xl transition-all duration-300 cursor-pointer overflow-hidden;
+  @apply border-2 border-transparent;
 }
 
-.kiosk-btn-secondary {
-  @apply bg-white text-black border-black hover:bg-black hover:text-white;
+.mbti-card.inactive {
+  @apply bg-gray-100 text-gray-500;
 }
 
-/* 토글 버튼 스타일 */
-.toggle-btn {
-  @apply flex-1 py-3 text-center font-bold text-lg border-2 border-black transition-all duration-200 cursor-pointer;
+.mbti-card.inactive:hover {
+  @apply bg-gray-200 text-gray-700;
+  transform: translateY(-2px);
 }
 
-.toggle-btn.active {
-  @apply bg-black text-white;
+.mbti-card.active {
+  @apply text-white shadow-lg;
+  transform: translateY(-2px);
 }
 
-.toggle-btn.inactive {
-  @apply bg-white text-black hover:bg-gray-100;
+.mbti-card.active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  z-index: -1;
+}
+
+/* MBTI 타입별 색상 */
+.mbti-ei.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.mbti-ns.active { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.mbti-tf.active { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.mbti-pj.active { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+
+/* 성별 버튼 */
+.gender-btn {
+  @apply flex-1 py-4 text-center font-bold text-base rounded-xl transition-all duration-300 cursor-pointer;
+  @apply border-2;
+}
+
+.gender-btn.inactive {
+  @apply bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50;
+}
+
+.gender-btn.active.male {
+  @apply bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-transparent shadow-lg;
+}
+
+.gender-btn.active.female {
+  @apply bg-gradient-to-r from-pink-500 to-rose-500 text-white border-transparent shadow-lg;
+}
+
+/* 테마 선택 버튼 */
+.theme-btn {
+  @apply font-bold py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all duration-300;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply hover:shadow-lg hover:-translate-y-1 active:scale-[0.98];
+}
+
+/* 라벨 스타일 */
+.form-label {
+  @apply text-sm font-semibold text-gray-500 mb-2 flex items-center gap-2;
+}
+
+.form-label-icon {
+  @apply w-4 h-4 text-purple-500;
+}
+
+/* 카드 섹션 */
+.form-card {
+  @apply bg-white/70 backdrop-blur-sm rounded-3xl p-6 shadow-sm border border-gray-100;
+}
+
+/* MBTI 결과 뱃지 */
+.mbti-badge {
+  @apply inline-flex items-center justify-center text-4xl font-black tracking-widest px-8 py-4;
+  @apply bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-transparent bg-clip-text;
+  @apply border-4 border-gray-900 rounded-2xl;
+  text-shadow: none;
+}
+
+/* 스크롤바 숨기기 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* 영수증 스타일 폰트 */
 .receipt-font {
   font-family: 'Courier New', Courier, monospace;
 }
+
+/* 애니메이션 */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* 도장 찍기 애니메이션 */
+@keyframes stamp-slam {
+  0% {
+    transform: rotate(-15deg) scale(3);
+    opacity: 0;
+  }
+  50% {
+    transform: rotate(-15deg) scale(0.9);
+    opacity: 1;
+  }
+  70% {
+    transform: rotate(-15deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(-15deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes stamp-shake {
+  0%, 100% { transform: rotate(-15deg) translateX(0); }
+  25% { transform: rotate(-15deg) translateX(-3px); }
+  75% { transform: rotate(-15deg) translateX(3px); }
+}
+
+.stamp-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.rank-stamp {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border: 4px double currentColor;
+  border-radius: 8px;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  text-transform: uppercase;
+  animation: stamp-slam 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  box-shadow:
+    inset 0 0 0 2px currentColor,
+    0 4px 15px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.rank-stamp::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: 8px;
+}
+
+.rank-stamp.animate-shake {
+  animation: stamp-slam 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards,
+             stamp-shake 0.3s ease-in-out 0.5s;
+}
+
+.rank-grade {
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 2px;
+}
+
+.rank-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  margin-top: 4px;
+  opacity: 0.9;
+}
+
+/* 등급별 색상 */
+.stamp-ss { color: #FFD700; border-color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+.stamp-s { color: #FF6B6B; border-color: #FF6B6B; }
+.stamp-a { color: #9B59B6; border-color: #9B59B6; }
+.stamp-b { color: #3498DB; border-color: #3498DB; }
+.stamp-c { color: #27AE60; border-color: #27AE60; }
+.stamp-d { color: #95A5A6; border-color: #95A5A6; }
+.stamp-e { color: #7F8C8D; border-color: #7F8C8D; }
+.stamp-f { color: #E74C3C; border-color: #E74C3C; text-shadow: 0 0 5px rgba(231, 76, 60, 0.3); }
