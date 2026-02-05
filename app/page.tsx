@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Printer, Loader2, RotateCcw, Download, Home } from "lucide-react";
+import { Printer, Loader2, RotateCcw, Download, Home as HomeIcon } from "lucide-react";
 import html2canvas from "html2canvas";
 import ReceiptView from "@/components/ReceiptView";
 import WantedView from "@/components/WantedView";
@@ -162,6 +162,29 @@ export default function Home() {
   // MBTI 조합
   const mbti = `${mbtiEI}${mbtiNS}${mbtiTF}${mbtiPJ}`;
 
+  // 생년월일 자동 포맷팅 핸들러
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+
+    // 숫자만 추출
+    const numbersOnly = input.replace(/\D/g, "");
+
+    // 최대 8자리 (YYYYMMDD)
+    const limited = numbersOnly.slice(0, 8);
+
+    // 포맷팅 적용
+    let formatted = "";
+    if (limited.length <= 4) {
+      formatted = limited;
+    } else if (limited.length <= 6) {
+      formatted = `${limited.slice(0, 4)}.${limited.slice(4)}`;
+    } else {
+      formatted = `${limited.slice(0, 4)}.${limited.slice(4, 6)}.${limited.slice(6)}`;
+    }
+
+    setBirthDate(formatted);
+  };
+
   // 폼 제출 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,7 +195,25 @@ export default function Home() {
       return;
     }
 
-    const [year, month, day] = birthDate.split("-").map(Number);
+    // 날짜 형식 검증 (YYYY.MM.DD)
+    const dateNumbers = birthDate.replace(/\D/g, "");
+    if (dateNumbers.length !== 8) {
+      setError("생년월일 8자리를 모두 입력해주세요. (예: 19980505)");
+      return;
+    }
+
+    const [year, month, day] = birthDate.split(".").map(Number);
+
+    // 유효성 검사
+    if (month < 1 || month > 12) {
+      setError("월은 1~12 사이여야 합니다.");
+      return;
+    }
+    if (day < 1 || day > 31) {
+      setError("일은 1~31 사이여야 합니다.");
+      return;
+    }
+
     let hour = 0;
     let minute = 0;
     if (birthTime) {
@@ -273,7 +314,7 @@ export default function Home() {
               onClick={handleReset}
               className="flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors"
             >
-              <Home className="w-4 h-4" />
+              <HomeIcon className="w-4 h-4" />
               처음으로
             </button>
           </div>
@@ -394,10 +435,13 @@ export default function Home() {
               BIRTH DATE
             </label>
             <input
-              type="date"
+              type="text"
+              inputMode="numeric"
               value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-              className="kiosk-input"
+              onChange={handleDateChange}
+              placeholder="YYYY.MM.DD (예: 19980505)"
+              className="kiosk-input text-center text-xl tracking-wider"
+              maxLength={10}
               required
             />
           </div>
