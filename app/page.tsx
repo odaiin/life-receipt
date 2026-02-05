@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Printer, Loader2, RotateCcw, Download } from "lucide-react";
+import { Printer, Loader2, RotateCcw, Download, Receipt, Crosshair } from "lucide-react";
 import html2canvas from "html2canvas";
 import ReceiptView from "@/components/ReceiptView";
+import WantedView from "@/components/WantedView";
 
 // API 응답 타입 정의
 interface SajuAnalysis {
@@ -32,6 +33,20 @@ interface ReceiptItem {
   price: number;
 }
 
+interface WantedTheme {
+  crimes: string[];
+  bounty: number;
+  danger_level: string;
+}
+
+interface ThemeData {
+  receipt: {
+    items: ReceiptItem[];
+    total: number;
+  };
+  wanted: WantedTheme;
+}
+
 interface AnalyzeResponse {
   user_info: {
     year: number;
@@ -45,7 +60,11 @@ interface AnalyzeResponse {
   saju_analysis: SajuAnalysis;
   receipt_items: ReceiptItem[];
   total_price: number;
+  theme_data?: ThemeData;
 }
+
+// 테마 타입
+type ThemeType = "receipt" | "wanted";
 
 // MBTI 토글 버튼 컴포넌트
 function MbtiToggle({
@@ -118,6 +137,7 @@ export default function Home() {
   const [isSaving, setIsSaving] = useState(false);
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [currentTheme, setCurrentTheme] = useState<ThemeType>("receipt");
 
   // 영수증 영역 Ref
   const receiptRef = useRef<HTMLDivElement>(null);
@@ -203,7 +223,7 @@ export default function Home() {
       // 가상의 <a> 태그 생성하여 다운로드 트리거
       const link = document.createElement("a");
       link.href = imageUrl;
-      link.download = "life-receipt.png";
+      link.download = currentTheme === "receipt" ? "life-receipt.png" : "wanted-poster.png";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -219,15 +239,48 @@ export default function Home() {
   const handleReset = () => {
     setResult(null);
     setError(null);
+    setCurrentTheme("receipt");
   };
 
   // 결과 화면
   if (result) {
     return (
-      <main className="min-h-screen bg-gray-200 py-8 px-4">
-        {/* 영수증 뷰 (캡처 대상) */}
+      <main className={`min-h-screen py-8 px-4 ${currentTheme === "receipt" ? "bg-gray-200" : "bg-amber-100"}`}>
+        {/* 테마 선택 탭 */}
+        <div className="max-w-sm mx-auto mb-6">
+          <div className="flex rounded-lg overflow-hidden border-2 border-gray-800">
+            <button
+              onClick={() => setCurrentTheme("receipt")}
+              className={`flex-1 py-3 px-4 flex items-center justify-center gap-2 font-bold transition-all ${
+                currentTheme === "receipt"
+                  ? "bg-gray-800 text-white"
+                  : "bg-white text-gray-800 hover:bg-gray-100"
+              }`}
+            >
+              <Receipt className="w-5 h-5" />
+              영수증
+            </button>
+            <button
+              onClick={() => setCurrentTheme("wanted")}
+              className={`flex-1 py-3 px-4 flex items-center justify-center gap-2 font-bold transition-all ${
+                currentTheme === "wanted"
+                  ? "bg-amber-700 text-white"
+                  : "bg-white text-amber-700 hover:bg-amber-50"
+              }`}
+            >
+              <Crosshair className="w-5 h-5" />
+              현상수배서
+            </button>
+          </div>
+        </div>
+
+        {/* 뷰 (캡처 대상) */}
         <div ref={receiptRef}>
-          <ReceiptView data={result} />
+          {currentTheme === "receipt" ? (
+            <ReceiptView data={result} />
+          ) : (
+            <WantedView data={result} />
+          )}
         </div>
 
         {/* 버튼 그룹 */}
@@ -236,7 +289,9 @@ export default function Home() {
           <button
             onClick={handleDownloadImage}
             disabled={isSaving}
-            className="w-full kiosk-btn kiosk-btn-primary flex items-center justify-center gap-2 py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`w-full kiosk-btn flex items-center justify-center gap-2 py-4 disabled:opacity-50 disabled:cursor-not-allowed ${
+              currentTheme === "receipt" ? "kiosk-btn-primary" : "bg-amber-700 text-white hover:bg-amber-800"
+            }`}
           >
             {isSaving ? (
               <>
@@ -257,7 +312,7 @@ export default function Home() {
             className="w-full kiosk-btn kiosk-btn-secondary flex items-center justify-center gap-2 py-3"
           >
             <RotateCcw className="w-5 h-5" />
-            다시 출력하기 (NEW RECEIPT)
+            다시 출력하기 (NEW)
           </button>
         </div>
       </main>
