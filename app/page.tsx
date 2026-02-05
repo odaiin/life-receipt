@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Printer, Loader2, RotateCcw, Download, Receipt, Crosshair } from "lucide-react";
+import { Printer, Loader2, RotateCcw, Download } from "lucide-react";
 import html2canvas from "html2canvas";
 import ReceiptView from "@/components/ReceiptView";
 import WantedView from "@/components/WantedView";
+import HospitalView from "@/components/HospitalView";
+import JoseonView from "@/components/JoseonView";
+import LoveView from "@/components/LoveView";
 
 // API 응답 타입 정의
 interface SajuAnalysis {
@@ -64,7 +67,16 @@ interface AnalyzeResponse {
 }
 
 // 테마 타입
-type ThemeType = "receipt" | "wanted";
+type ThemeType = "receipt" | "wanted" | "hospital" | "joseon" | "love";
+
+// 테마 설정
+const THEME_CONFIG = {
+  receipt: { label: "영수증", icon: "🧾", bg: "bg-gray-200", btnColor: "bg-gray-800" },
+  wanted: { label: "현상수배", icon: "🤠", bg: "bg-amber-100", btnColor: "bg-amber-700" },
+  hospital: { label: "진단서", icon: "🏥", bg: "bg-slate-100", btnColor: "bg-slate-600" },
+  joseon: { label: "호적", icon: "📜", bg: "bg-amber-50", btnColor: "bg-amber-800" },
+  love: { label: "미연시", icon: "💖", bg: "bg-pink-100", btnColor: "bg-pink-500" },
+};
 
 // MBTI 토글 버튼 컴포넌트
 function MbtiToggle({
@@ -223,7 +235,14 @@ export default function Home() {
       // 가상의 <a> 태그 생성하여 다운로드 트리거
       const link = document.createElement("a");
       link.href = imageUrl;
-      link.download = currentTheme === "receipt" ? "life-receipt.png" : "wanted-poster.png";
+      const fileNames: Record<ThemeType, string> = {
+        receipt: "life-receipt.png",
+        wanted: "wanted-poster.png",
+        hospital: "diagnosis-report.png",
+        joseon: "joseon-hojeok.png",
+        love: "love-status.png",
+      };
+      link.download = fileNames[currentTheme];
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -244,43 +263,47 @@ export default function Home() {
 
   // 결과 화면
   if (result) {
+    const themeConfig = THEME_CONFIG[currentTheme];
+
     return (
-      <main className={`min-h-screen py-8 px-4 ${currentTheme === "receipt" ? "bg-gray-200" : "bg-amber-100"}`}>
-        {/* 테마 선택 탭 */}
-        <div className="max-w-sm mx-auto mb-6">
-          <div className="flex rounded-lg overflow-hidden border-2 border-gray-800">
-            <button
-              onClick={() => setCurrentTheme("receipt")}
-              className={`flex-1 py-3 px-4 flex items-center justify-center gap-2 font-bold transition-all ${
-                currentTheme === "receipt"
-                  ? "bg-gray-800 text-white"
-                  : "bg-white text-gray-800 hover:bg-gray-100"
-              }`}
-            >
-              <Receipt className="w-5 h-5" />
-              영수증
-            </button>
-            <button
-              onClick={() => setCurrentTheme("wanted")}
-              className={`flex-1 py-3 px-4 flex items-center justify-center gap-2 font-bold transition-all ${
-                currentTheme === "wanted"
-                  ? "bg-amber-700 text-white"
-                  : "bg-white text-amber-700 hover:bg-amber-50"
-              }`}
-            >
-              <Crosshair className="w-5 h-5" />
-              현상수배서
-            </button>
+      <main className={`min-h-screen py-8 px-4 ${themeConfig.bg}`}>
+        {/* 스크롤 가능한 테마 선택 탭 */}
+        <div className="max-w-md mx-auto mb-6">
+          <div className="overflow-x-auto scrollbar-hide">
+            <div className="flex gap-2 pb-2 min-w-max">
+              {(Object.keys(THEME_CONFIG) as ThemeType[]).map((theme) => {
+                const config = THEME_CONFIG[theme];
+                const isActive = currentTheme === theme;
+                return (
+                  <button
+                    key={theme}
+                    onClick={() => setCurrentTheme(theme)}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-lg font-bold transition-all whitespace-nowrap ${
+                      isActive
+                        ? `${config.btnColor} text-white shadow-lg scale-105`
+                        : "bg-white/80 text-gray-700 hover:bg-white border border-gray-200"
+                    }`}
+                  >
+                    <span className="text-lg">{config.icon}</span>
+                    <span className="text-sm">{config.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
+          {/* 스크롤 힌트 */}
+          <p className="text-center text-xs text-gray-500 mt-2">
+            ← 좌우 스크롤로 테마 선택 →
+          </p>
         </div>
 
         {/* 뷰 (캡처 대상) */}
-        <div ref={receiptRef}>
-          {currentTheme === "receipt" ? (
-            <ReceiptView data={result} />
-          ) : (
-            <WantedView data={result} />
-          )}
+        <div ref={receiptRef} className="py-2">
+          {currentTheme === "receipt" && <ReceiptView data={result} />}
+          {currentTheme === "wanted" && <WantedView data={result} />}
+          {currentTheme === "hospital" && <HospitalView data={result} />}
+          {currentTheme === "joseon" && <JoseonView data={result} />}
+          {currentTheme === "love" && <LoveView data={result} />}
         </div>
 
         {/* 버튼 그룹 */}
@@ -289,9 +312,7 @@ export default function Home() {
           <button
             onClick={handleDownloadImage}
             disabled={isSaving}
-            className={`w-full kiosk-btn flex items-center justify-center gap-2 py-4 disabled:opacity-50 disabled:cursor-not-allowed ${
-              currentTheme === "receipt" ? "kiosk-btn-primary" : "bg-amber-700 text-white hover:bg-amber-800"
-            }`}
+            className={`w-full kiosk-btn flex items-center justify-center gap-2 py-4 disabled:opacity-50 disabled:cursor-not-allowed text-white ${themeConfig.btnColor} hover:opacity-90`}
           >
             {isSaving ? (
               <>
