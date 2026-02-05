@@ -1,0 +1,21 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# Next.js 플러그인 사용
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# API 프록시 설정 (핵심!)
+# 브라우저 → Netlify(/api/analyze) → Contabo 서버
+[[redirects]]
+  from = "/api/analyze"
+  to = "http://184.174.37.242:8000/analyze"
+  status = 200
+  force = true
+
+# SPA 폴백 (Next.js 라우팅용)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
