@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Printer, Loader2, RotateCcw, Download, Home as HomeIcon } from "lucide-react";
+import { Loader2, RotateCcw, Download, Home as HomeIcon } from "lucide-react";
 import html2canvas from "html2canvas";
 import ReceiptView from "@/components/ReceiptView";
 import WantedView from "@/components/WantedView";
@@ -397,34 +397,30 @@ export default function Home() {
 
   // ==================== 입력 화면 (Landing View) ====================
   return (
-    <main className="min-h-screen bg-white flex flex-col">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col">
       {/* 히어로 헤더 */}
-      <header className="flex-shrink-0 pt-12 pb-8 px-4">
+      <header className="flex-shrink-0 pt-10 pb-6 px-4">
         <div className="max-w-md mx-auto text-center">
-          {/* 로고 */}
-          <div className="mb-4">
-            <span className="text-6xl">🧾</span>
+          {/* 타이틀 */}
+          <div className="mb-3">
+            <h1 className="text-3xl md:text-4xl font-black text-gray-900">
+              사주 <span className="text-purple-600">×</span> MBTI
+            </h1>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
-            LIFE RECEIPT
-          </h1>
-          <p className="text-lg text-gray-500 mt-2 tracking-wide">
-            STORE
+          <p className="text-gray-500 text-sm">
+            생년월일과 MBTI로 나를 분석해보세요
           </p>
-          <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600">
-            <span>사주</span>
-            <span className="text-gray-300">×</span>
-            <span>MBTI</span>
-            <span className="text-gray-300">=</span>
-            <span className="font-bold text-gray-900">나의 인생 영수증</span>
+          {/* 테마 미리보기 */}
+          <div className="mt-4 flex justify-center gap-2 text-2xl">
+            <span title="영수증">🧾</span>
+            <span title="현상수배">🤠</span>
+            <span title="진단서">🏥</span>
+            <span title="호적">📜</span>
+            <span title="미연시">💖</span>
           </div>
+          <p className="text-xs text-gray-400 mt-2">5가지 테마로 결과 확인</p>
         </div>
       </header>
-
-      {/* 구분선 */}
-      <div className="max-w-md mx-auto w-full px-4">
-        <div className="border-t-4 border-black" />
-      </div>
 
       {/* 입력 폼 */}
       <div className="flex-1 max-w-md mx-auto w-full px-4 py-8">
@@ -506,10 +502,7 @@ export default function Home() {
                   <span>분석 중...</span>
                 </>
               ) : (
-                <>
-                  <Printer className="w-6 h-6" />
-                  <span>영수증 출력하기</span>
-                </>
+                <span>결과 보기</span>
               )}
             </button>
           </div>
@@ -518,8 +511,8 @@ export default function Home() {
 
       {/* 푸터 */}
       <footer className="flex-shrink-0 py-6 text-center text-xs text-gray-400">
-        <p>LIFE RECEIPT STORE - Est. 2024</p>
-        <p className="mt-1">Your Destiny, Printed Fresh.</p>
+        <p>사주 × MBTI 분석</p>
+        <p className="mt-1">재미로만 봐주세요 :)</p>
       </footer>
     </main>
   );
