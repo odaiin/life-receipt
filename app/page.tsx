@@ -27,6 +27,11 @@ interface SajuAnalysis {
   lacking_traits_korean: string[];
 }
 
+interface ReceiptItem {
+  name: string;
+  price: number;
+}
+
 interface AnalyzeResponse {
   user_info: {
     year: number;
@@ -38,6 +43,8 @@ interface AnalyzeResponse {
     mbti: string;
   };
   saju_analysis: SajuAnalysis;
+  receipt_items: ReceiptItem[];
+  total_price: number;
 }
 
 // MBTI 토글 버튼 컴포넌트

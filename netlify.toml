@@ -13,9 +13,3 @@
   to = "http://184.174.37.242:8000/analyze"
   status = 200
   force = true
-
-# SPA 폴백 (Next.js 라우팅용)
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
