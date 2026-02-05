@@ -39,6 +39,12 @@ interface SajuAnalysis {
   lacking_traits_korean: string[];
 }
 
+interface HospitalTheme {
+  diseases: string[];
+  prescriptions: string[];
+  severity: string;
+}
+
 interface AnalyzeResponse {
   user_info: {
     year: number;
@@ -50,6 +56,9 @@ interface AnalyzeResponse {
     mbti: string;
   };
   saju_analysis: SajuAnalysis;
+  theme_data?: {
+    hospital?: HospitalTheme;
+  };
 }
 
 interface HospitalViewProps {
@@ -137,26 +146,44 @@ const PRESCRIPTION_DB = [
 ];
 
 export default function HospitalView({ data }: HospitalViewProps) {
-  const { user_info, saju_analysis } = data;
+  const { user_info, saju_analysis, theme_data } = data;
+  const hospitalData = theme_data?.hospital;
 
   // 환자 번호
   const patientNo = useMemo(() => {
     return `PT-${user_info.year}${String(user_info.month).padStart(2, "0")}${String(user_info.day).padStart(2, "0")}-${Math.floor(Math.random() * 999) + 1}`;
   }, [user_info]);
 
-  // 진단명 선택
+  // API에서 진단명 가져오기 (폴백: 하드코딩된 데이터)
   const diagnoses = useMemo(() => {
+    if (hospitalData?.diseases && hospitalData.diseases.length > 0) {
+      // API 데이터를 진단 코드와 함께 반환
+      return hospitalData.diseases.map((name, i) => ({
+        name,
+        code: `F${60 + i}.${Math.floor(Math.random() * 9)}`,
+      }));
+    }
     const mbtiDiagnoses = DIAGNOSIS_DB[user_info.mbti] || DIAGNOSIS_DB["ENTP"];
     return mbtiDiagnoses;
-  }, [user_info.mbti]);
+  }, [hospitalData, user_info.mbti]);
 
-  // 처방 선택
+  // API에서 처방 가져오기 (폴백: 랜덤)
   const prescription = useMemo(() => {
+    if (hospitalData?.prescriptions && hospitalData.prescriptions.length > 0) {
+      return hospitalData.prescriptions.join(" + ");
+    }
     return PRESCRIPTION_DB[Math.floor(Math.random() * PRESCRIPTION_DB.length)];
-  }, []);
+  }, [hospitalData]);
 
-  // 입원 여부 결정 (랜덤)
-  const needsAdmission = useMemo(() => Math.random() > 0.3, []);
+  // API에서 심각도 가져오기 (폴백: 랜덤)
+  const needsAdmission = useMemo(() => {
+    if (hospitalData?.severity) {
+      return hospitalData.severity === "입원 요망" || hospitalData.severity === "즉시 격리";
+    }
+    return Math.random() > 0.3;
+  }, [hospitalData]);
+
+  const severityLabel = hospitalData?.severity || (needsAdmission ? "입원 요망" : "치료 불가");
 
   // 현재 날짜
   const today = new Date().toLocaleDateString("ko-KR");

@@ -43,12 +43,35 @@ interface WantedTheme {
   danger_level: string;
 }
 
+interface HospitalTheme {
+  diseases: string[];
+  prescriptions: string[];
+  severity: string;
+}
+
+interface JoseonTheme {
+  job: string;
+  job_hanja: string;
+  skill: string;
+  rank: string;
+}
+
+interface LoveTheme {
+  difficulty: number;
+  charm: string;
+  weakness: string;
+  tips: string[];
+}
+
 interface ThemeData {
   receipt: {
     items: ReceiptItem[];
     total: number;
   };
   wanted: WantedTheme;
+  hospital: HospitalTheme;
+  joseon: JoseonTheme;
+  love: LoveTheme;
 }
 
 interface AnalyzeResponse {
